@@ -16,8 +16,7 @@
 
   const winModal = document.getElementById('winModal');
   const closeWin = document.getElementById('closeWin');
-  const copyBtn  = document.getElementById('copyBtn');
-  const passInput= document.getElementById('passcode');
+  const continueBtn = document.getElementById('continueBtn');
 
   let tiles = [];
   let emptyIndex = 0;
@@ -26,41 +25,33 @@
 
   gridLabel.textContent = `${SIZE}×${SIZE}`;
 
-startBtn.addEventListener('click', async () => {
-  // Immediately reveal UI so it doesn't feel stuck
-  startOverlay.style.display = 'none';
-  gameRoot.classList.remove('hidden');
+  startBtn.addEventListener('click', async () => {
+    startOverlay.style.display = 'none';
+    gameRoot.classList.remove('hidden');
 
-  const imgSrc = boardEl.dataset.img || 'Halloween Puzzle.PNG';
-
-  // Try to preload; if it fails, keep going with a fallback so the game always starts
-  try {
-    spriteURL = await preloadImage(imgSrc);
-  } catch (e) {
-    console.warn('Image failed to preload, continuing with fallback:', e);
-    spriteURL = encodeURI(imgSrc); // still try to use it
-  }
-
-  // Reference image (if you have one)
-  if (typeof refImg !== 'undefined' && refImg) {
+    const imgSrc = boardEl.dataset.img || 'Halloween Puzzle.JPG';
+    try {
+      spriteURL = await preloadImage(imgSrc);
+    } catch (e) {
+      console.warn('Image preload failed, continuing anyway:', e);
+      spriteURL = encodeURI(imgSrc);
+    }
     refImg.src = spriteURL;
-    refImg.onerror = () => { refImg.style.display = 'none'; }; // hide if missing
-  }
 
-  // Ensure grid is correct (4×4 if medium)
-  boardEl.style.gridTemplateColumns = `repeat(${SIZE}, 1fr)`;
-  boardEl.style.gridTemplateRows   = `repeat(${SIZE}, 1fr)`;
+    // set board grid to SIZE × SIZE (overrides CSS)
+    boardEl.style.gridTemplateColumns = `repeat(${SIZE}, 1fr)`;
+    boardEl.style.gridTemplateRows = `repeat(${SIZE}, 1fr)`;
 
-  build();
-});
+    build();
+  });
 
   newBtn.addEventListener('click', build);
   closeWin.addEventListener('click', () => winModal.classList.add('hidden'));
-  copyBtn.addEventListener('click', () => {
-    passInput.select(); passInput.setSelectionRange(0, 999);
-    try { document.execCommand('copy'); copyBtn.textContent = 'Copied!'; } catch {}
-    setTimeout(() => (copyBtn.textContent = 'Copy code'), 1100);
-  });
+  if (continueBtn) {
+    continueBtn.addEventListener('click', (e) => {
+      // Default anchor behavior navigates; no extra JS necessary
+    });
+  }
 
   // keep swipes from scrolling the page
   boardEl.addEventListener('touchmove', (e) => e.preventDefault(), {passive:false});
@@ -74,7 +65,7 @@ startBtn.addEventListener('click', async () => {
     do {
       perm = shuffle(goal.slice(0, COUNT - 1));
       perm.push(COUNT - 1);
-    } while (!isSolvableOdd(perm));      // 4×4 uses “odd inversion” rule like 5×5
+    } while (!isSolvableOdd(perm));      // 4×4: even inversions
 
     tiles = perm;
     emptyIndex = tiles.indexOf(COUNT - 1);
@@ -84,20 +75,19 @@ startBtn.addEventListener('click', async () => {
       cell.className = 'tile';
       cell.dataset.pos = idx;
 
-if (n === COUNT - 1) {
-  cell.classList.add('empty');
-} else {
-  const x = n % SIZE;
-  const y = Math.floor(n / SIZE);
-  if (spriteURL) {
-    cell.style.backgroundImage = `url("${spriteURL}")`;
-    cell.style.backgroundSize = `${SIZE*100}% ${SIZE*100}%`;
-    cell.style.backgroundPosition = `${(x/(SIZE-1))*100}% ${(y/(SIZE-1))*100}%`;
-  } else {
-    // visual fallback (still fully playable)
-    cell.style.background = 'radial-gradient(#202738, #0f172a)';
-  }
-}
+      if (n === COUNT - 1) {
+        cell.classList.add('empty');
+      } else {
+        const x = n % SIZE;
+        const y = Math.floor(n / SIZE);
+        if (spriteURL) {
+          cell.style.backgroundImage = `url("${spriteURL}")`;
+          cell.style.backgroundSize = `${SIZE*100}% ${SIZE*100}%`;
+          cell.style.backgroundPosition = `${(x/(SIZE-1))*100}% ${(y/(SIZE-1))*100}%`;
+        } else {
+          cell.style.background = 'radial-gradient(#202738, #0f172a)';
+        }
+      }
 
       cell.addEventListener('click', () => tryMove(idx));
       cell.addEventListener('touchstart', () => tryMove(idx), {passive:true});
@@ -105,23 +95,17 @@ if (n === COUNT - 1) {
     });
   }
 
-function tryMove(idx) {
-  if (!isAdjacent(idx, emptyIndex)) return;
-  swapTiles(idx, emptyIndex);
-  emptyIndex = idx;
-  moves++;
-  movesEl.textContent = moves;
-  if (isSolved()) showSuccess();
-}
+  function tryMove(idx) {
+    if (!isAdjacent(idx, emptyIndex)) return;
+    swapTiles(idx, emptyIndex);
+    emptyIndex = idx;
+    moves++; movesEl.textContent = moves;
+    if (isSolved()) showSuccess();
+  }
 
-function showSuccess() {
-  winModal.classList.remove('hidden');
-  const contBtn = document.getElementById('continueBtn');
-  // When clicked, send the player to the next hub or page
-  contBtn.addEventListener('click', () => {
-    window.location.href = "https://murresta13.github.io/consequences/";
-  });
-}
+  function showSuccess(){
+    winModal.classList.remove('hidden');
+  }
 
   function swapTiles(i, j){
     [tiles[i], tiles[j]] = [tiles[j], tiles[i]];

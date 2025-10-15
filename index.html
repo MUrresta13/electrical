@@ -11,7 +11,7 @@
   <div id="startOverlay" class="overlay">
     <div class="overlay-card">
       <h1>🪚 The Reverse Puzzle</h1>
-      <p>Medium mode — complete the <strong>4×4</strong> sliding puzzle to reveal the passcode for Clue 11 in the Main Hub.</p>
+      <p>Medium mode — complete the <strong>4×4</strong> sliding puzzle to proceed.</p>
       <button id="startBtn" class="btn big">Start the Challenge</button>
     </div>
   </div>
@@ -23,14 +23,15 @@
 
   <main id="game" class="hidden">
     <section class="hud">
-      <div><strong>Grid:</strong> 4×4</div>
+      <div><strong>Grid:</strong> <span id="gridLabel">4×4</span></div>
       <div><strong>Moves:</strong> <span id="moves">0</span></div>
       <button id="newBtn" class="btn">New Puzzle</button>
     </section>
 
+    <!-- Puzzle + reference side by side -->
     <section class="play">
       <div class="left">
-        <div id="puzzle" class="board" data-img="Halloween Puzzle 3.JPG"></div>
+        <div id="puzzle" class="board" data-img="Halloween Puzzle.JPG"></div>
         <p class="hint">Tap or slide tiles next to the empty space.</p>
       </div>
 
@@ -44,9 +45,10 @@
   <!-- Success Modal -->
   <div id="winModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card">
-      <h2>🎉 Success!</h2>
-      <p>You’ve completed the puzzle. Click below to continue.</p>
-      <a href="#" id="continueBtn" class="btn big">Continue</a>
+      <h3 style="margin-top:0">✅ SUCCESS!</h3>
+      <p>You’ve completed the puzzle.</p>
+      <a href="https://murresta13.github.io/consequences/" id="continueBtn" class="btn big" style="display:inline-block;text-decoration:none;text-align:center">Continue</a>
+      <button id="closeWin" class="btn ghost" style="margin-left:8px">Close</button>
     </div>
   </div>
 
