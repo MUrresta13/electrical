@@ -87,13 +87,23 @@
     });
   }
 
-  function tryMove(idx) {
-    if (!isAdjacent(idx, emptyIndex)) return;
-    swapTiles(idx, emptyIndex);
-    emptyIndex = idx;
-    moves++; movesEl.textContent = moves;
-    if (isSolved()) winModal.classList.remove('hidden');
-  }
+function tryMove(idx) {
+  if (!isAdjacent(idx, emptyIndex)) return;
+  swapTiles(idx, emptyIndex);
+  emptyIndex = idx;
+  moves++;
+  movesEl.textContent = moves;
+  if (isSolved()) showSuccess();
+}
+
+function showSuccess() {
+  winModal.classList.remove('hidden');
+  const contBtn = document.getElementById('continueBtn');
+  // When clicked, send the player to the next hub or page
+  contBtn.addEventListener('click', () => {
+    window.location.href = "https://murresta13.github.io/consequences/";
+  });
+}
 
   function swapTiles(i, j){
     [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
