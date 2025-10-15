@@ -26,20 +26,33 @@
 
   gridLabel.textContent = `${SIZE}×${SIZE}`;
 
-  startBtn.addEventListener('click', async () => {
-    startOverlay.style.display = 'none';
-    gameRoot.classList.remove('hidden');
+startBtn.addEventListener('click', async () => {
+  // Immediately reveal UI so it doesn't feel stuck
+  startOverlay.style.display = 'none';
+  gameRoot.classList.remove('hidden');
 
-    const imgSrc = boardEl.dataset.img || 'Halloween Puzzle.PNG';
+  const imgSrc = boardEl.dataset.img || 'Halloween Puzzle.PNG';
+
+  // Try to preload; if it fails, keep going with a fallback so the game always starts
+  try {
     spriteURL = await preloadImage(imgSrc);
+  } catch (e) {
+    console.warn('Image failed to preload, continuing with fallback:', e);
+    spriteURL = encodeURI(imgSrc); // still try to use it
+  }
+
+  // Reference image (if you have one)
+  if (typeof refImg !== 'undefined' && refImg) {
     refImg.src = spriteURL;
+    refImg.onerror = () => { refImg.style.display = 'none'; }; // hide if missing
+  }
 
-    // set board grid to SIZE × SIZE (overrides CSS)
-    boardEl.style.gridTemplateColumns = `repeat(${SIZE}, 1fr)`;
-    boardEl.style.gridTemplateRows = `repeat(${SIZE}, 1fr)`;
+  // Ensure grid is correct (4×4 if medium)
+  boardEl.style.gridTemplateColumns = `repeat(${SIZE}, 1fr)`;
+  boardEl.style.gridTemplateRows   = `repeat(${SIZE}, 1fr)`;
 
-    build();
-  });
+  build();
+});
 
   newBtn.addEventListener('click', build);
   closeWin.addEventListener('click', () => winModal.classList.add('hidden'));
@@ -71,15 +84,20 @@
       cell.className = 'tile';
       cell.dataset.pos = idx;
 
-      if (n === COUNT - 1) {
-        cell.classList.add('empty');
-      } else {
-        const x = n % SIZE;
-        const y = Math.floor(n / SIZE);
-        cell.style.backgroundImage = `url("${spriteURL}")`;
-        cell.style.backgroundSize = `${SIZE*100}% ${SIZE*100}%`;
-        cell.style.backgroundPosition = `${(x/(SIZE-1))*100}% ${(y/(SIZE-1))*100}%`;
-      }
+if (n === COUNT - 1) {
+  cell.classList.add('empty');
+} else {
+  const x = n % SIZE;
+  const y = Math.floor(n / SIZE);
+  if (spriteURL) {
+    cell.style.backgroundImage = `url("${spriteURL}")`;
+    cell.style.backgroundSize = `${SIZE*100}% ${SIZE*100}%`;
+    cell.style.backgroundPosition = `${(x/(SIZE-1))*100}% ${(y/(SIZE-1))*100}%`;
+  } else {
+    // visual fallback (still fully playable)
+    cell.style.background = 'radial-gradient(#202738, #0f172a)';
+  }
+}
 
       cell.addEventListener('click', () => tryMove(idx));
       cell.addEventListener('touchstart', () => tryMove(idx), {passive:true});
