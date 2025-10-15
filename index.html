@@ -52,6 +52,24 @@
     </div>
   </div>
 
+  <!-- Full black screen for end audio and captions -->
+  <div id="blackout" class="blackout hidden">
+    <div id="cc" class="captions hidden"></div>
+  </div>
+
+  <!-- Final passcode modal -->
+  <div id="finalModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3 style="margin-top:0">🎉 You made it out of Jigsaw's Hub!</h3>
+      <p>Passcode for Clue 11:</p>
+      <div class="code-row">
+        <input id="finalCode" class="code" value="PENNYWISEDMIND" readonly />
+        <button id="finalCopy" class="btn small">Copy code</button>
+      </div>
+      <button id="finalClose" class="btn ghost">Close</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
