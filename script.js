@@ -29,7 +29,7 @@
     startOverlay.style.display = 'none';
     gameRoot.classList.remove('hidden');
 
-    const imgSrc = boardEl.dataset.img || 'Halloween Puzzle.JPG';
+    const imgSrc = boardEl.dataset.img || 'Halloween Puzzle 3.png';
     try {
       spriteURL = await preloadImage(imgSrc);
     } catch (e) {
@@ -48,9 +48,7 @@
   newBtn.addEventListener('click', build);
   closeWin.addEventListener('click', () => winModal.classList.add('hidden'));
   if (continueBtn) {
-    continueBtn.addEventListener('click', (e) => {
-      // Default anchor behavior navigates; no extra JS necessary
-    });
+    continueBtn.addEventListener('click', (e) => {});
   }
 
   // keep swipes from scrolling the page
